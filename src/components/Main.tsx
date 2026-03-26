@@ -1,6 +1,8 @@
+import { useCoins } from "../context/coins.context";
 import NavigationSection from "./NavigationSection";
 
 const Main = () => {
+  const { coins } = useCoins();
   return (
     <div className="py-5 sm:px-[10%] px-[5%] bg-[#eee] ">
       <h4 className="capitalize text-3xl font-bold text-gray-800">
@@ -22,7 +24,7 @@ const Main = () => {
               clipRule="evenodd"
             />
           </svg>
-          <b>1,705,534</b>
+          <b> {coins.toLocaleString("en-Us")} </b>
         </span>
       </div>
       <NavigationSection />
