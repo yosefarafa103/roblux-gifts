@@ -11,6 +11,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { ChevronRight } from "lucide-react";
 import { useDebounce } from "../hooks/useDebounce";
+// @ts-ignore
 import { useUsersStore, type User as UserType } from "../stores/users.store";
 import User from "./User";
 import { useQuery } from "@tanstack/react-query";
@@ -33,17 +34,17 @@ const NavigationSection = () => {
     if (!debouncedValue) return;
     console.log("🔥 API CALL:", debouncedValue);
   }, [debouncedValue]);
-  const fakeUsers: UserType[] = [
-    { id: "1", name: "Ahmed Ali", role: "Member" },
-    { id: "2", name: "Sara Mohamed", role: "Admin" },
-    { id: "3", name: "Omar Khaled", role: "Member" },
-    { id: "4", name: "Mona Hassan", role: "Moderator" },
-    { id: "5", name: "Youssef Tarek", role: "Member" },
-  ];
+  // const fakeUsers = [
+  //   { id: "1", name: "Ahmed Ali", role: "Member" },
+  //   { id: "2", name: "Sara Mohamed", role: "Admin" },
+  //   { id: "3", name: "Omar Khaled", role: "Member" },
+  //   { id: "4", name: "Mona Hassan", role: "Moderator" },
+  //   { id: "5", name: "Youssef Tarek", role: "Member" },
+  // ];
   console.log(debouncedValue, isPending, isReady);
 
   const { users } = useUsersStore();
-  const { data, isLoading, isFetching } = useQuery<ResponseType>({
+  const { data, isLoading } = useQuery<ResponseType>({
     queryKey: ["users", debouncedValue],
     queryFn: () => searchUsers(debouncedValue),
     enabled: !!debouncedValue && isReady,
@@ -137,15 +138,15 @@ const NavigationSection = () => {
                       "loading"
                     ) : data?.data.length ? (
                       <>
-                        {fakeUsers.map(({ id, name }) => (
+                        {data?.data.map(({ id, name }) => (
                           <User {...{ id, name }} />
                         ))}
                       </>
-                    ) : (
+                    ) : debouncedValue && !data?.data.length ? (
                       <h4 className="text-lg text-center mt-2">
                         No Players With ( {username} ) found!{" "}
                       </h4>
-                    )}
+                    ) : null}
                   </section>
                   <section className="absolute bottom-0 p-4 left-1/2 -translate-x-1/2 gap-2 flex">
                     <DialogClose className="px-5 py-2 rounded-md border-gray-400 bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50">
