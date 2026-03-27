@@ -4,7 +4,7 @@ import NavigationSection from "./NavigationSection";
 const Main = () => {
   const { coins } = useCoins();
   return (
-    <div className="py-5 sm:px-[10%] px-[5%] bg-[#eee] ">
+    <div className="py-3 sm:px-[10%] px-[2%] bg-[#eee] ">
       <h4 className="capitalize text-3xl font-bold text-gray-800">
         Configure novely fan group
       </h4>
