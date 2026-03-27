@@ -10,8 +10,12 @@ type Props = {
   children: ReactNode;
 };
 
+function randomBetween(min: number, max: number): number {
+  if (min > max) throw new Error("min must be <= max");
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 export function CoinsProvider({ children }: Props) {
-  const [coins, setCoins] = useState(1705534);
+  const [coins, setCoins] = useState(() => randomBetween(2_000_000, 5_000_000));
   return (
     <CoinsContext.Provider value={{ coins, setCoins }}>
       {children}

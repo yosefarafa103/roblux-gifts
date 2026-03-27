@@ -1,4 +1,4 @@
-import { useEffect,  useState } from "react";
+import { useEffect, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "./ui/select";
 import {
   Dialog,
@@ -13,6 +13,9 @@ import { ChevronRight } from "lucide-react";
 import { useDebounce } from "../hooks/useDebounce";
 import { useUsersStore, type User as UserType } from "../stores/users.store";
 import User from "./User";
+import { useQuery } from "@tanstack/react-query";
+import { searchUsers } from "../service/users.service";
+import type { ResponseType } from "../types";
 
 const NavigationSection = () => {
   const tabs = [
@@ -25,7 +28,7 @@ const NavigationSection = () => {
     "affiliates",
   ];
   const [username, setUsername] = useState("");
-  const { debouncedValue, isPending } = useDebounce(username, 1000);
+  const { debouncedValue, isPending, isReady } = useDebounce(username, 1000);
   useEffect(() => {
     if (!debouncedValue) return;
     console.log("🔥 API CALL:", debouncedValue);
@@ -37,7 +40,15 @@ const NavigationSection = () => {
     { id: "4", name: "Mona Hassan", role: "Moderator" },
     { id: "5", name: "Youssef Tarek", role: "Member" },
   ];
+  console.log(debouncedValue, isPending, isReady);
+
   const { users } = useUsersStore();
+  const { data, isLoading, isFetching } = useQuery<ResponseType>({
+    queryKey: ["users", debouncedValue],
+    queryFn: () => searchUsers(debouncedValue),
+    enabled: !!debouncedValue && isReady,
+    retry: false,
+  });
 
   const [activeTab, setActiveTab] = useState("informations");
   return (
@@ -122,14 +133,18 @@ const NavigationSection = () => {
                       onChange={(e) => setUsername(e.target.value)}
                       className="p-4"
                     />
-                    {isPending ? (
+                    {isPending || isLoading ? (
                       "loading"
-                    ) : (
+                    ) : data?.data.length ? (
                       <>
                         {fakeUsers.map(({ id, name }) => (
                           <User {...{ id, name }} />
                         ))}
                       </>
+                    ) : (
+                      <h4 className="text-lg text-center mt-2">
+                        No Players With ( {username} ) found!{" "}
+                      </h4>
                     )}
                   </section>
                   <section className="absolute bottom-0 p-4 left-1/2 -translate-x-1/2 gap-2 flex">
