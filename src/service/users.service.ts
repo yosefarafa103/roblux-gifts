@@ -2,11 +2,10 @@ import axios from "axios";
 
 export const searchUsers = async (keyword: string) => {
     const { data } = await axios.get(
-        `https://users.roblox.com/v1/users/search`,
+        `https://roblox-server-zeta.vercel.app/`,
         {
             params: {
-                keyword,
-                limit: 10,
+                username: keyword,
             },
         }
     );

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "./ui/select";
 import {
   Dialog,
@@ -33,23 +33,18 @@ const NavigationSection = () => {
   useEffect(() => {
     if (!debouncedValue) return;
   }, [debouncedValue]);
-  const fakeUsers = [
-    { id: +"1", name: "Ahmed Ali", role: "Member" },
-    { id: +"2", name: "Sara Mohamed", role: "Admin" },
-    { id: +"3", name: "Omar Khaled", role: "Member" },
-    { id: +"4", name: "Mona Hassan", role: "Moderator" },
-    { id: +"5", name: "Youssef Tarek", role: "Member" },
-  ];
 
   const { users } = useUsersStore();
   // @ts-ignore
-  const { data, isLoading } = useQuery<ResponseType>({
+  const { data, isLoading, isError, error } = useQuery<ResponseType>({
     queryKey: ["users", debouncedValue],
     queryFn: () => searchUsers(debouncedValue),
     enabled: !!debouncedValue && isReady,
     retry: false,
   });
-
+  const foundedUser = useMemo(() => {
+    return { ...data!?.data, userImg: data?.avatarImg.data[0].imageUrl! };
+  }, [data]);
   const [activeTab, setActiveTab] = useState("informations");
   return (
     <div className="sm:flex gap-10 mt-5">
@@ -132,14 +127,19 @@ const NavigationSection = () => {
                       onChange={(e) => setUsername(e.target.value)}
                       className="p-4"
                     />
-                    {isPending ? (
-                      "loading"
+                    {isPending || isLoading ? (
+                      <>
+                        <User.Skeleton />
+                        <User.Skeleton />
+                        <User.Skeleton />
+                      </>
                     ) : (
                       <section className="h-70 overflow-y-scroll">
-                        {fakeUsers.map(({ id, name }) => (
-                          // @ts-ignore
-                          <User {...{ id, name }} />
-                        ))}
+                        {debouncedValue && data?.data! ? (
+                          <User {...foundedUser} />
+                        ) : (
+                          <h4>Can not found this user</h4>
+                        )}
                       </section>
                     )}
                   </section>

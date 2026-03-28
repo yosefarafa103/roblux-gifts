@@ -1,23 +1,18 @@
+import type { User } from "@/types";
 import { create } from "zustand";
 
-export type User = {
-    id: string;
-    name: string;
-    role?: string;
-    username: string;
-};
 
 type UsersStore = {
     users: User[];
-
-    addUser: (user: User) => void;
-    removeUser: (id: string) => void;
+    addUser: (user: Pick<User, "id" | "name" | "userImg">) => void;
+    removeUser: (id: number) => void;
     clearUsers: () => void;
 };
 
 export const useUsersStore = create<UsersStore>((set) => ({
     users: [],
     addUser: (user) =>
+        // @ts-ignore
         set((state) => ({
             users: [...state.users, user],
         })),

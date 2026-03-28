@@ -1,12 +1,13 @@
-import { useUsersStore, type User as UserType } from "../stores/users.store";
+import { type User as UserType } from "../types";
 import { Diamond, DiamondIcon, Plus, Trash } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 import { useCoins } from "../context/coins.context";
 import toast from "react-hot-toast";
+import { useUsersStore } from "../stores/users.store";
 
-function User({ id, name, username }: UserType) {
+function User({ id, name, userImg }: UserType) {
   const { users, addUser, removeUser } = useUsersStore();
   const isExists = useMemo(() => {
     return !!users.find((user) => user.id === id);
@@ -16,12 +17,15 @@ function User({ id, name, username }: UserType) {
       <div
         onClick={() => {
           if (isExists) return;
-          addUser({ id, name, username });
+          addUser({ id, name, userImg });
         }}
         className="flex gap-4 items-center hover:bg-[#f7f7f7] p-2 transition cursor-pointer"
       >
-        {/* Img Here Frpm aPi */}
-        <img src="" className="min-w-14 size-14! rounded-full" loading="lazy" />
+        <img
+          src={userImg}
+          className="min-w-14 size-14! rounded-full"
+          loading="lazy"
+        />
         <div className="flex justify-between w-full items-center">
           <div className="flex flex-col">
             <h5 className="text-[15px]">{name}</h5>
@@ -41,7 +45,7 @@ function User({ id, name, username }: UserType) {
   );
 }
 // @ts-ignore
-export function RecipentUser({ name, id, username }: UserType) {
+export function RecipentUser({ name, id, userImg }: UserType) {
   const { coins, setCoins } = useCoins();
   const { removeUser } = useUsersStore();
   const [value, setValue] = useState("");
@@ -53,7 +57,11 @@ export function RecipentUser({ name, id, username }: UserType) {
     <>
       <div className="px-2 bg-white rounded-sm">
         <div className="flex gap-3 items-center p-1 px-3 transition cursor-pointer">
-          <img src="" className="min-w-8 size-8! rounded-full" loading="lazy" />
+          <img
+            src={userImg}
+            className="min-w-8 size-8! rounded-full"
+            loading="lazy"
+          />
           <div className="flex justify-between w-full items-center">
             <div className="flex flex-col">
               <h5 className="foont-bold">{name}</h5>
@@ -96,7 +104,8 @@ export function RecipentUser({ name, id, username }: UserType) {
                 toast.custom(
                   () => (
                     <div className="bg-green-600 p-2 text-white sm:top-10 top-5 sm:w-[50%] w-[90%] text-center max-sm:text-sm">
-                      {value} roblox Were Paid Out To Users From The Group
+                      {Number(value).toLocaleString("en-Us")} roblox Were Paid
+                      Out To Users From The Group
                     </div>
                   ),
                   {
@@ -115,5 +124,24 @@ export function RecipentUser({ name, id, username }: UserType) {
     </>
   );
 }
+
+const UserItemSkeleton = () => {
+  return (
+    <div className="flex gap-4 items-center p-2 animate-pulse">
+      <div className="min-w-14 size-14 rounded-full bg-gray-300" />
+
+      <div className="flex justify-between w-full items-center">
+        <div className="flex flex-col gap-2">
+          <div className="h-4 w-32 bg-gray-300 rounded" />
+
+          <div className="h-3 w-20 bg-gray-200 rounded" />
+        </div>
+
+        <div className="h-5 w-5 bg-gray-300 rounded" />
+      </div>
+    </div>
+  );
+};
 export default User;
 User.RecipentUser = RecipentUser;
+User.Skeleton = UserItemSkeleton;
