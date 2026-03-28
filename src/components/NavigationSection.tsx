@@ -32,18 +32,17 @@ const NavigationSection = () => {
   const { debouncedValue, isPending, isReady } = useDebounce(username, 1000);
   useEffect(() => {
     if (!debouncedValue) return;
-    console.log("🔥 API CALL:", debouncedValue);
   }, [debouncedValue]);
-  // const fakeUsers = [
-  //   { id: "1", name: "Ahmed Ali", role: "Member" },
-  //   { id: "2", name: "Sara Mohamed", role: "Admin" },
-  //   { id: "3", name: "Omar Khaled", role: "Member" },
-  //   { id: "4", name: "Mona Hassan", role: "Moderator" },
-  //   { id: "5", name: "Youssef Tarek", role: "Member" },
-  // ];
-  console.log(debouncedValue, isPending, isReady);
+  const fakeUsers = [
+    { id: +"1", name: "Ahmed Ali", role: "Member" },
+    { id: +"2", name: "Sara Mohamed", role: "Admin" },
+    { id: +"3", name: "Omar Khaled", role: "Member" },
+    { id: +"4", name: "Mona Hassan", role: "Moderator" },
+    { id: +"5", name: "Youssef Tarek", role: "Member" },
+  ];
 
   const { users } = useUsersStore();
+  // @ts-ignore
   const { data, isLoading } = useQuery<ResponseType>({
     queryKey: ["users", debouncedValue],
     queryFn: () => searchUsers(debouncedValue),
@@ -106,9 +105,8 @@ const NavigationSection = () => {
                     Amount
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">1</SelectItem>
-                    <SelectItem value="2">2</SelectItem>
-                    <SelectItem value="3">3</SelectItem>
+                    <SelectItem value="by_roblux">By Robux</SelectItem>
+                    <SelectItem value="by_coins">By Coins</SelectItem>
                   </SelectContent>
                 </Select>
               </>
@@ -134,19 +132,16 @@ const NavigationSection = () => {
                       onChange={(e) => setUsername(e.target.value)}
                       className="p-4"
                     />
-                    {isPending || isLoading ? (
+                    {isPending ? (
                       "loading"
-                    ) : data?.data.length ? (
-                      <>
-                        {data?.data.map(({ id, name }) => (
+                    ) : (
+                      <section className="h-70 overflow-y-scroll">
+                        {fakeUsers.map(({ id, name }) => (
+                          // @ts-ignore
                           <User {...{ id, name }} />
                         ))}
-                      </>
-                    ) : debouncedValue && !data?.data.length ? (
-                      <h4 className="text-lg text-center mt-2">
-                        No Players With ( {username} ) found!{" "}
-                      </h4>
-                    ) : null}
+                      </section>
+                    )}
                   </section>
                   <section className="absolute bottom-0 p-4 left-1/2 -translate-x-1/2 gap-2 flex">
                     <DialogClose className="px-5 py-2 rounded-md border-gray-400 bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50">
