@@ -1,23 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "./ui/select";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 import { ChevronRight } from "lucide-react";
 import { useDebounce } from "../hooks/useDebounce";
-// @ts-ignore
-import { useUsersStore, type User as UserType } from "../stores/users.store";
+import { useUsersStore } from "../stores/users.store";
 import User from "./User";
 import { useQuery } from "@tanstack/react-query";
 import { searchUsers } from "../service/users.service";
 import type { ResponseType } from "../types";
-
+import fakeUsers from "../data/users.json";
+const UsersDialog = lazy(() => import("./UsersDialog"));
 const NavigationSection = () => {
   const tabs = [
     "informations",
@@ -29,14 +20,13 @@ const NavigationSection = () => {
     "affiliates",
   ];
   const [username, setUsername] = useState("");
-  const { debouncedValue, isPending, isReady } = useDebounce(username, 1000);
+  const { debouncedValue, isPending, isReady } = useDebounce(username, 1500);
   useEffect(() => {
     if (!debouncedValue) return;
   }, [debouncedValue]);
-
+  useEffect(() => () => setUsername(""), []);
   const { users } = useUsersStore();
-  // @ts-ignore
-  const { data, isLoading, isError, error } = useQuery<ResponseType>({
+  const { data, isLoading } = useQuery<ResponseType>({
     queryKey: ["users", debouncedValue],
     queryFn: () => searchUsers(debouncedValue),
     enabled: !!debouncedValue && isReady,
@@ -45,6 +35,13 @@ const NavigationSection = () => {
   const foundedUser = useMemo(() => {
     return { ...data!?.data, userImg: data?.avatarImg.data[0].imageUrl! };
   }, [data]);
+  const filterdUsers = useMemo(
+    () =>
+      fakeUsers.filter((user) =>
+        user.name.toLowerCase().includes(username.toLowerCase()),
+      ),
+    [username],
+  );
   const [activeTab, setActiveTab] = useState("informations");
   return (
     <div className="sm:flex gap-10 mt-5">
@@ -107,52 +104,18 @@ const NavigationSection = () => {
               </>
             </div>
             <section>
-              <Dialog>
-                <DialogTrigger className="flex flex-col">
-                  <Button size="lg" variant={"outline"}>
-                    Add Payout Recipents
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="rounded-none p-3 min-h-125 flex flex-col lg:min-w-120">
-                  <DialogTitle className="border-b-2 py-3 border-[#ddd] h-fit">
-                    Add Payout Recipents
-                  </DialogTitle>
-                  <section className="flex flex-col gap-2">
-                    <h3 className="text-gray-500">
-                      Enter the payout recipient's username
-                    </h3>
-                    <Input
-                      placeholder="username"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      className="p-4"
-                    />
-                    {isPending || isLoading ? (
-                      <>
-                        <User.Skeleton />
-                        <User.Skeleton />
-                        <User.Skeleton />
-                      </>
-                    ) : (
-                      <section className="h-70 overflow-y-scroll">
-                        {debouncedValue && data?.data! ? (
-                          <User {...foundedUser} />
-                        ) : (
-                          <h4>Can not found this user</h4>
-                        )}
-                      </section>
-                    )}
-                  </section>
-                  <section className="absolute bottom-0 p-4 left-1/2 -translate-x-1/2 gap-2 flex">
-                    <DialogClose className="px-5 py-2 rounded-md border-gray-400 bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50">
-                      Ok
-                    </DialogClose>
-                    <DialogClose className="px-5 py-2 rounded-md bg-primary text-primary-foreground [a]:hover:bg-primary/80">
-                      cancel
-                    </DialogClose>
-                  </section>
-                </DialogContent>
-              </Dialog>
+              <Suspense fallback={<>Dialog Is Loading.. </>}>
+                <UsersDialog
+                  data={data!}
+                  debouncedValue={debouncedValue}
+                  filterdUsers={filterdUsers}
+                  foundedUser={foundedUser}
+                  isLoading={isLoading}
+                  isPending={isPending}
+                  setUsername={setUsername}
+                  username={username}
+                />
+              </Suspense>
               <section className="mt-4">
                 {users.map((el) => (
                   <User.RecipentUser {...el} />

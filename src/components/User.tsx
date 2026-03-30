@@ -6,7 +6,8 @@ import { Button } from "./ui/button";
 import { useCoins } from "../context/coins.context";
 import toast from "react-hot-toast";
 import { useUsersStore } from "../stores/users.store";
-
+import defaultImg from "../../public/noFilter.png";
+import { AnimatePresence, motion } from "framer-motion";
 function User({ id, name, userImg }: UserType) {
   const { users, addUser, removeUser } = useUsersStore();
   const isExists = useMemo(() => {
@@ -22,7 +23,7 @@ function User({ id, name, userImg }: UserType) {
         className="flex gap-4 items-center hover:bg-[#f7f7f7] p-2 transition cursor-pointer"
       >
         <img
-          src={userImg}
+          src={userImg || defaultImg}
           className="min-w-14 size-14! rounded-full"
           loading="lazy"
         />
@@ -50,15 +51,13 @@ export function RecipentUser({ name, id, userImg }: UserType) {
   const { removeUser } = useUsersStore();
   const [value, setValue] = useState("");
   const inputRef = useRef<HTMLInputElement | null>(null);
-  useEffect(() => {
-    setValue("");
-  }, [coins]);
+  useEffect(() => setValue(""), [coins]);
   return (
     <>
       <div className="px-2 bg-white rounded-sm">
         <div className="flex gap-3 items-center p-1 px-3 transition cursor-pointer">
           <img
-            src={userImg}
+            src={userImg || defaultImg}
             className="min-w-8 size-8! rounded-full"
             loading="lazy"
           />
@@ -102,14 +101,23 @@ export function RecipentUser({ name, id, userImg }: UserType) {
               onClick={() => {
                 setCoins(coins - +value);
                 toast.custom(
-                  () => (
-                    <div className="bg-green-600 p-2 text-white sm:top-10 top-5 sm:w-[50%] w-[90%] text-center max-sm:text-sm">
-                      {Number(value).toLocaleString("en-Us")} roblox Were Paid
-                      Out To Users From The Group
-                    </div>
+                  ({ visible }) => (
+                    <AnimatePresence>
+                      {visible && (
+                        <motion.div
+                          initial={{ scaleY: 0 }}
+                          animate={{ scaleY: 1 }}
+                          exit={{ scaleY: 0 }}
+                          className="bg-green-600 text origin-top p-2 text-white sm:top-10 top-5 sm:w-[50%] w-[90%] text-center max-sm:text-sm"
+                        >
+                          {Number(value).toLocaleString("en-Us")} roblox Were
+                          Paid Out To Users From The Group
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   ),
                   {
-                    duration: 2000,
+                    duration: 3_000,
                   },
                 );
                 removeUser(id);

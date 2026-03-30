@@ -6,7 +6,7 @@ const Main = () => {
   return (
     <div className="py-3 sm:px-[10%] px-[2%] bg-[#eee] ">
       <h4 className="capitalize text-3xl font-bold text-gray-800">
-        Configure novely fan group
+        Configure Dinvo fan group
       </h4>
       <div className="flex flex-col">
         <span>by novely</span>
