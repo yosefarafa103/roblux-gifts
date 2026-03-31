@@ -1,13 +1,15 @@
 import { type User as UserType } from "../types";
-import { Diamond, DiamondIcon, Plus, Trash } from "lucide-react";
+import { Plus, Trash } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "../lib/utils";
+
 import { Button } from "./ui/button";
 import { useCoins } from "../context/coins.context";
 import toast from "react-hot-toast";
 import { useUsersStore } from "../stores/users.store";
 import defaultImg from "../../public/noFilter.png";
 import { AnimatePresence, motion } from "framer-motion";
+import RobloxLogo from "./RobloxLogo";
 function User({ id, name, userImg }: UserType) {
   const { users, addUser, removeUser } = useUsersStore();
   const isExists = useMemo(() => {
@@ -67,7 +69,7 @@ export function RecipentUser({ name, id, userImg }: UserType) {
               <span className="text-gray-500 text-sm">Member</span>
             </div>
             <div className="flex items-center gap-4">
-              <DiamondIcon className="ml-10" />
+              <RobloxLogo />
               <input
                 ref={inputRef}
                 onChange={(e) => setValue(e.target.value)}
@@ -84,7 +86,8 @@ export function RecipentUser({ name, id, userImg }: UserType) {
       <div className="flex justify-end flex-col gap-1 ml-auto w-fit mt-4">
         <h3 className="flex gap-1 items-center">
           Paying Out:
-          <Diamond /> {Number(value).toLocaleString("en-Us")}
+          <RobloxLogo />
+          {Number(value).toLocaleString("en-Us")}
         </h3>
         {coins - +value < 0 ? (
           <span className="font-bold text-red-700 capitalize">
@@ -94,7 +97,7 @@ export function RecipentUser({ name, id, userImg }: UserType) {
           <>
             <h6 className="flex gap-1 items-center">
               Remainig Funds:
-              <Diamond />
+              <RobloxLogo />
               <b>{(coins - +value).toLocaleString("en-Us")}</b>
             </h6>
             <Button
@@ -150,6 +153,7 @@ const UserItemSkeleton = () => {
     </div>
   );
 };
-export default User;
 User.RecipentUser = RecipentUser;
 User.Skeleton = UserItemSkeleton;
+
+export default User;

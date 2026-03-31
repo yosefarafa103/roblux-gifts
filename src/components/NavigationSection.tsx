@@ -42,7 +42,7 @@ const NavigationSection = () => {
       ),
     [username],
   );
-  const [activeTab, setActiveTab] = useState("informations");
+  const [activeTab, setActiveTab] = useState("revenue");
   return (
     <div className="sm:flex gap-10 mt-5">
       <div className="flex-1">
